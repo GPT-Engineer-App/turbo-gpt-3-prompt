@@ -1,15 +1,54 @@
-// Complete the Index page component here
-// Use chakra-ui
-import { Button } from "@chakra-ui/react"; // example
-import { FaPlus } from "react-icons/fa"; // example - use react-icons/fa for icons
+import React, { useState } from 'react';
+import { Box, Button, Input, Textarea, VStack, Text } from '@chakra-ui/react';
+import { FaPaperPlane } from 'react-icons/fa';
 
 const Index = () => {
-  // TODO: Create the website here!
+  const [prompt, setPrompt] = useState('');
+  const [response, setResponse] = useState('');
+
+  const handlePromptChange = (e) => setPrompt(e.target.value);
+
+  const handleSubmit = async () => {
+    try {
+      const res = await fetch('/api/generate-response', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt }),
+      });
+
+      const data = await res.json();
+      setResponse(data.response);
+    } catch (error) {
+      console.error('Error fetching response:', error);
+      setResponse('An error occurred while fetching the response.');
+    }
+  };
+
   return (
-    <Button>
-      Hello world! <FaPlus />
-    </Button>
-  ); // example
+    <Box p={4}>
+      <VStack spacing={4}>
+        <Input
+          placeholder="Enter your prompt here..."
+          value={prompt}
+          onChange={handlePromptChange}
+        />
+        <Button
+          leftIcon={<FaPaperPlane />}
+          colorScheme="teal"
+          onClick={handleSubmit}
+        >
+          Submit
+        </Button>
+        <Textarea
+          placeholder="Response will appear here..."
+          value={response}
+          isReadOnly
+        />
+      </VStack>
+    </Box>
+  );
 };
 
 export default Index;
